@@ -22,7 +22,7 @@ class InputDialog(QDialog):
         self.addButton.clicked.connect(self.add)
         self.layout.addWidget(self.addButton)
 
-        self.importButton = QPushButton("Import", self)
+        self.importButton = QPushButton("Import from List", self)
         self.importButton.clicked.connect(self.import_guitars)
         self.layout.addWidget(self.importButton)
 
