@@ -25,12 +25,10 @@ def main():
     guitars = []
     dialog = InputDialog()
     dialog.add_another.connect(guitars.append)
-    dialog.add_many.connect(guitars.extend)  # connect add_many signal to guitars.extend function
-    while True:
-        ok = dialog.exec_()
-        if not ok:
-            break
+    dialog.add_many.connect(lambda g: (guitars.extend(g), dialog.close(), start_search(guitars)))  # close dialog and start search when add_many is emitted
+    dialog.exec_()
 
+def start_search(guitars):
     # Setup Chrome options
     chrome_options = Options()
     chrome_options.add_experimental_option("detach", True)
@@ -80,7 +78,7 @@ def main():
         # Look for the guitar in the search results
         try:
             search_result = WebDriverWait(driver, 10).until(
-                EC.visibility_of_element_located((By.XPATH, f"//a[contains(@href, '{guitar.replace(' ', '-').lower()}') and contains(text(), '{guitar}')]"))
+    EC.visibility_of_element_located((By.XPATH, f"//a[contains(translate(@href, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '{guitar.replace(' ', '-').lower()}') and contains(text(), '{guitar}')]"))
             )
             found_guitars.append(guitar)
         except TimeoutException:
