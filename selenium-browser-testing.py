@@ -25,6 +25,7 @@ def main():
     guitars = []
     dialog = InputDialog()
     dialog.add_another.connect(guitars.append)
+    dialog.add_many.connect(guitars.extend)  # connect add_many signal to guitars.extend function
     while True:
         ok = dialog.exec_()
         if not ok:
@@ -103,3 +104,6 @@ def main():
 
     # Close the browser
     driver.quit()
+
+if __name__ == "__main__":
+    main()
