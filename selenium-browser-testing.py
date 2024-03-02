@@ -16,94 +16,90 @@ from selenium.common.exceptions import TimeoutException
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QLineEdit, QPushButton
 from input_dialog import InputDialog
 
-# Create a QApplication instance
-app = QApplication([])
+def main():
 
-# Ask the user for a list of guitars
-guitars = []
-dialog = InputDialog()
-dialog.add_another.connect(guitars.append)
-while True:
-    ok = dialog.exec_()
-    guitar = dialog.textValue().strip()  # strip leading/trailing whitespace
-    if ok and guitar:
-        if guitar.lower() == 'done':
+    # Create a QApplication instance
+    app = QApplication([])
+
+    # Ask the user for a list of guitars
+    guitars = []
+    dialog = InputDialog()
+    dialog.add_another.connect(guitars.append)
+    while True:
+        ok = dialog.exec_()
+        if not ok:
             break
-        else:
-            guitars.append(guitar)
-    elif not ok:
-        break
 
-# Setup Chrome options
-chrome_options = Options()
-chrome_options.add_experimental_option("detach", True)
+    # Setup Chrome options
+    chrome_options = Options()
+    chrome_options.add_experimental_option("detach", True)
 
-# Create a new instance of the Chrome driver
-s=Service('./chromedriver.exe')
-driver = webdriver.Chrome(service=s, options=chrome_options)
+    # Create a new instance of the Chrome driver
+    s=Service('./chromedriver.exe')
+    driver = webdriver.Chrome(service=s, options=chrome_options)
 
-# Open the website
-driver.get("https://www.musiciansfriend.com/")
-driver.maximize_window()
+    # Open the website
+    driver.get("https://www.musiciansfriend.com/")
+    driver.maximize_window()
 
-# Lists to keep track of which guitars were found and which were not
-found_guitars = []
-not_found_guitars = []
+    # Lists to keep track of which guitars were found and which were not
+    found_guitars = []
+    not_found_guitars = []
 
-# Search for each guitar
-for guitar in guitars:
-    # Wait for the search bar element to be visible and then interact with it
-    wait = WebDriverWait(driver, 10)  # wait for up to 10 seconds
-    search_bar = wait.until(EC.visibility_of_element_located((By.ID, "searchTerm")))
+    # Search for each guitar
+    for guitar in guitars:
+        # Wait for the search bar element to be visible and then interact with it
+        wait = WebDriverWait(driver, 10)  # wait for up to 10 seconds
+        search_bar = wait.until(EC.visibility_of_element_located((By.ID, "searchTerm")))
 
-    # Clear the search bar
-    search_bar.clear()
+        # Clear the search bar
+        search_bar.clear()
 
-    # Click on the search bar
-    search_bar.click()
+        # Click on the search bar
+        search_bar.click()
 
-    # Enter the guitar name in the search bar and press Enter
-    search_bar.send_keys(guitar)
-    search_bar.send_keys(Keys.RETURN)
+        # Enter the guitar name in the search bar and press Enter
+        search_bar.send_keys(guitar)
+        search_bar.send_keys(Keys.RETURN)
 
-    # Wait for the pop-up window to appear
-    try:
-        decline_offer_button = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, "//button[@aria-label='Decline Offer; close the dialog']"))
-        )
-        # Click on the decline offer button
-        decline_offer_button.click()
-    except TimeoutException:
-        # If the pop-up window does not appear within 10 seconds, ignore it
-        pass
+        # Wait for the pop-up window to appear
+        try:
+            decline_offer_button = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located((By.XPATH, "//button[@aria-label='Decline Offer; close the dialog']"))
+            )
+            # Click on the decline offer button
+            decline_offer_button.click()
+        except TimeoutException:
+            # If the pop-up window does not appear within 10 seconds, ignore it
+            pass
 
-    # Wait for the search results to load
-    time.sleep(5)
+        # Wait for the search results to load
+        time.sleep(5)
 
-    # Look for the guitar in the search results
-    try:
-        search_result = WebDriverWait(driver, 10).until(
-            EC.visibility_of_element_located((By.XPATH, f"//a[contains(@href, '{guitar.replace(' ', '-').lower()}') and contains(text(), '{guitar}')]"))
-        )
-        found_guitars.append(guitar)
-    except TimeoutException:
-        not_found_guitars.append(guitar)
+        # Look for the guitar in the search results
+        try:
+            search_result = WebDriverWait(driver, 10).until(
+                EC.visibility_of_element_located((By.XPATH, f"//a[contains(@href, '{guitar.replace(' ', '-').lower()}') and contains(text(), '{guitar}')]"))
+            )
+            found_guitars.append(guitar)
+        except TimeoutException:
+            not_found_guitars.append(guitar)
 
-# Print the lists of found and not found guitars
-print("Found guitars:")
-for guitar in found_guitars:
-    print(guitar)
+    # Print the lists of found and not found guitars
+    print("Found guitars:")
+    for guitar in found_guitars:
+        print(guitar)
 
-print("\nNot found guitars:")
-for guitar in not_found_guitars:
-    print(guitar)
+    print("\nNot found guitars:")
+    for guitar in not_found_guitars:
+        print(guitar)
 
-# selenium-browser-testing.py
-from result_dialog import ResultDialog
+    # selenium-browser-testing.py
+    from result_dialog import ResultDialog
 
-# After the search is done
-result_dialog = ResultDialog(found_guitars, not_found_guitars)
-result_dialog.exec_()
+    # After the search is done
+    result_dialog = ResultDialog(found_guitars, not_found_guitars)
+    result_dialog.exec_()
 
-# Close the browser
-driver.quit()
+    # Close the browser
+    driver.quit()
