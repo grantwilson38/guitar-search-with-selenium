@@ -11,10 +11,10 @@ Display of search results, showing which guitars were found and which were not.
 
 **Requirements**
 
-Python 3.6+
-Selenium WebDriver
-ChromeDriver
-PyQt5
+- Python 3.6+
+- Selenium WebDriver
+- ChromeDriver
+- PyQt5
 
 **Usage**
 
