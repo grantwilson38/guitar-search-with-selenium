@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -7,18 +12,24 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-from PyQt5.QtWidgets import QApplication, QInputDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QLineEdit, QPushButton
+from input_dialog import InputDialog
 
+# Create a QApplication instance
+app = QApplication([])
 
 # Ask the user for a list of guitars
 guitars = []
 while True:
-    guitar = input("Enter a guitar you are looking for, or 'done' to finish: ")
-    if guitar.lower() == 'done':
+    dialog = InputDialog()
+    ok = dialog.exec_()
+    guitar = dialog.textValue()
+    if ok and guitar:
+        if guitar.lower() == 'done':
+            break
+        guitars.append(guitar)
+    elif not ok:
         break
-    guitars.append(guitar)
-
-# Now, the list 'guitars' contains the guitars the user is looking for
 
 # Setup Chrome options
 chrome_options = Options()
