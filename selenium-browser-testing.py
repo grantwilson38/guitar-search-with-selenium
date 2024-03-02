@@ -7,6 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+from PyQt5.QtWidgets import QApplication, QInputDialog
+
+
 # Ask the user for a list of guitars
 guitars = []
 while True:
